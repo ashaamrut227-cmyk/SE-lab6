@@ -3,7 +3,9 @@ import pytest
 from traffic_fine import speeding_fine, license_action, total_penalty
 
 
+# -------------------------------
 # 1. Tests for speeding_fine()
+# -------------------------------
 
 def test_no_speeding():
     assert speeding_fine(50, 60, "city") == 0
@@ -20,20 +22,22 @@ def test_city_zone():
 def test_excess_speed_above_40():
     assert speeding_fine(105, 60, "city") == 1500
 
+def test_excess_speed_equal_40():
+    assert speeding_fine(100, 60, "city") == 1000
+
 def test_excess_speed_above_20():
     assert speeding_fine(85, 60, "city") == 1000
 
-def test_excess_speed_20_or_less():
-    assert speeding_fine(75, 60, "city") == 500
+def test_excess_speed_equal_20():
+    assert speeding_fine(80, 60, "city") == 500
 
 
+# -------------------------------
 # 2. Tests for license_action()
+# -------------------------------
 
 def test_clean_record():
     assert license_action(2, False, False) == "none"
-
-def test_points_below_4():
-    assert license_action(3, False, False) == "none"
 
 def test_points_equal_4():
     assert license_action(4, False, False) == "notice"
@@ -57,7 +61,9 @@ def test_commercial_driver():
     assert license_action(12, True, False) == "revoke"
 
 
+# -------------------------------
 # 3. Tests for total_penalty()
+# -------------------------------
 
 def test_total_penalty_normal():
     assert total_penalty([100, 200, 300]) == 600
@@ -69,7 +75,7 @@ def test_total_penalty_single_fine():
     assert total_penalty([500]) == 500
 
 def test_total_penalty_negative_fine():
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="negative fine"):
         total_penalty([100, -50, 200])
 
 def test_total_penalty_above_limit():
